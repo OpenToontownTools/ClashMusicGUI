@@ -1,0 +1,5 @@
+aiohttp
+pyqt5
+pyside2
+pyinstaller
+requests
