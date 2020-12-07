@@ -258,7 +258,8 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         with open(f'{self.root}/audio/music.json', 'w') as output:
         
             data = {
-                '_OpenToontownTools': "This file was generated using the Clash Music GUI. https://github.com/OpenToontownTools/ClashMusicGUI",
+                # This doesn't work right now, it prevents the file from loading in clash for some reason
+                #'_OpenToontownTools': "This file was generated using the Clash Music GUI. https://github.com/OpenToontownTools/ClashMusicGUI",
                 'default': {},
                 'halloween': {},
                 'christmas': {},
