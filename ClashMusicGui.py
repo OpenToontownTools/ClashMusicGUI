@@ -3,7 +3,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-import ast, builtins, json, os, pathlib, requests, subprocess, sys
+import ast, builtins, glob, json, os, pathlib, requests, subprocess, sys
 from ui_window import Ui_MainWindow
 from ui_override import Ui_OverrideUI
 from ui_compiledial import Ui_CompilingDialog
@@ -296,15 +296,21 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         if not os.path.exists(settings['panda-path']):
             QMessageBox.warning(self, "ClashMusicGui", "You need to select your Panda3D directory in the OPTIONS tab!")
             return
-            
+        self.saveFile()
         packname, _ = QInputDialog.getText(self, "Pack File Name", "Enter a pack filename", text = os.path.basename(self.root))
-        process = subprocess.run([
+        
+        args = [
             f"{settings['panda-path']}/bin/multify.exe",
-            '-c', f'-f{packname}.mf', 'audio', 'phase_3', 'phase_3.5', 
-            'phase_4', 'phase_5', 'phase_6', 'phase_7', 
-            'phase_8', 'phase_9', 'phase_10', 'phase_11', 
-            'phase_12', 'phase_13', 'phase_14', 'phase_15'
-            ], shell = True, cwd = self.root, stderr = subprocess.PIPE, universal_newlines=True)
+            '-c', f'-f{packname}.mf']
+            
+        # Include all folders / files inside the root
+        for path in glob.glob(f'{self.root}/*'):
+            # except for .mf files - its likely a previous compiled verison
+            if os.path.splitext(path)[1] == '.mf':
+                continue
+            args.append(os.path.basename(path))
+        
+        process = subprocess.run(args, shell = True, cwd = self.root, stderr = subprocess.PIPE, universal_newlines=True)
 
 
         dial = CompileDialog()
