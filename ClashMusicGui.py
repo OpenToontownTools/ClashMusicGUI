@@ -203,8 +203,9 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         settings['last-path'] = path
         self.rootDisplay.setText(path)
         
-        # The logic for detecting an existing music.json file will go below:
+        # Detect existing music.json file
         if os.path.exists(f'{self.root}/audio/music.json'):
+            # If it exists, open and do everything
             with open(f'{self.root}/audio/music.json') as jsonfile:
                 data = json.load(jsonfile)
                 if 'default' in data:
