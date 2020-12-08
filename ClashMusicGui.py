@@ -171,8 +171,8 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         
         # Create the label
         lbl = QLabel();
-        # By default, we show the default song
-        lbl.setText(file)
+        # Set the text as the file(s)
+        lbl.setText(str(file))
         
         # Add the label to a list of labels for later editing
 
