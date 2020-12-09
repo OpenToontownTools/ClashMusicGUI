@@ -4,6 +4,10 @@ Tool to assist resource pack creators with Music.json
 The source code is publicly available for contributions, but if you do not intend on contributing, I recommend you download the pre-built [installers](https://github.com/OpenToontownTools/ClashMusicGUI/releases)
 (The installer will eventually be replaced with an Open Toontown Tools launcher which includes auto updating and will be a hub for all Open Toontown Tools applications)
 
+# Common issues and their fixes
+## When launching the application, the command window appears for a second, then closes
+* This is likely the application having difficulties creating the settings folder. To solve this, navigate to your Documents Library, and create a folder called `OpenToontownTools`, then inside of it create a folder called `ClashResourcePackEditor`.
+
 # How-To Guide
 ### How to edit the music using this application
 1. Open the application
