@@ -5,8 +5,8 @@ The source code is publicly available for contributions, but if you do not inten
 (The installer will eventually be replaced with an Open Toontown Tools launcher which includes auto updating and will be a hub for all Open Toontown Tools applications)
 
 # Common issues and their fixes
-## When launching the application, the command window appears for a second, then closes
-* This is likely the application having difficulties creating the settings folder. To solve this, navigate to your Documents Library, and create a folder called `OpenToontownTools`, then inside of it create a folder called `ClashResourcePackEditor`.
+## ~~When launching the application, the command window appears for a second, then closes~~
+* ~~This is likely the application having difficulties creating the settings folder. To solve this, navigate to your Documents Library, and create a folder called `OpenToontownTools`, then inside of it create a folder called `ClashResourcePackEditor`.~~ *This issue should be fixed in release 1.0.1_01*
 
 # How-To Guide
 ### How to edit the music using this application
