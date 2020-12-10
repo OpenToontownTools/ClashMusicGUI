@@ -4,15 +4,17 @@ Tool to assist resource pack creators with Music.json
 The source code is publicly available for contributions, but if you do not intend on contributing, I recommend you download the pre-built [installers](https://github.com/OpenToontownTools/ClashMusicGUI/releases)
 (The installer will eventually be replaced with an Open Toontown Tools launcher which includes auto updating and will be a hub for all Open Toontown Tools applications)
 
-## Note
+## Notices
 * Currently there is no way to select vanilla base game files using this tool, it is currently required that all music files you want to use are located inside of your pack root directory. This will likely change in the future
+* The folder or filename of the ogg file you select does not matter, as long as it is located inside the root folder.
+    * i.e., you can set donalds_dreamland_sz as `ddlplayground.ogg` located in `playgrounds/dreamland/`, it does **not** need to be `phase_8/audio/bgm/DL_nbrhood.ogg`
 
 # How-To Guide
 ### How to edit the music using this application
 1. Open the application
 2. Set the root folder. This will be the folder where the audio and the phase folders are contained.
 ![step2](https://raw.githubusercontent.com/OpenToontownTools/web/master/assets/rpehowto/rpe_howto_step2.png)
-3. For any song you want to change the file path of, look for it and press Browse. In this example, I will be changing the Sellbot HQ Courtyard theme to the Toontown Infinite Donald's Dreamland Playground theme, which in my pack, is located at `phase_9/audio/bgm/DL_nbrhood.ogg`
+3. For any song you want to change the file path of, look for it and press Browse. In this example, I will be changing the Sellbot HQ Courtyard theme to the Toontown Infinite Donald's Dreamland Playground theme, which in my pack, is located at `phase_8/audio/bgm/DL_nbrhood.ogg`
 ![step3](https://raw.githubusercontent.com/OpenToontownTools/web/master/assets/rpehowto/rpe_howto_step3.png)
 4. Locate and select the file you want. If you intend to have the game randomly select between different files, you can select multiple in this screen.
 ![step4](https://raw.githubusercontent.com/OpenToontownTools/web/master/assets/rpehowto/rpe_howto_step4.png)
