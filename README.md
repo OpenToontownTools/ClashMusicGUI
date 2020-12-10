@@ -4,6 +4,9 @@ Tool to assist resource pack creators with Music.json
 The source code is publicly available for contributions, but if you do not intend on contributing, I recommend you download the pre-built [installers](https://github.com/OpenToontownTools/ClashMusicGUI/releases)
 (The installer will eventually be replaced with an Open Toontown Tools launcher which includes auto updating and will be a hub for all Open Toontown Tools applications)
 
+## Note
+* Currently there is no way to select vanilla base game files using this tool, it is currently required that all music files you want to use are located inside of your pack root directory. This will likely change in the future
+
 # How-To Guide
 ### How to edit the music using this application
 1. Open the application
@@ -32,7 +35,7 @@ The source code is publicly available for contributions, but if you do not inten
 ![step13](https://raw.githubusercontent.com/OpenToontownTools/web/master/assets/rpehowto/rpe_howto_step13.png)
     * If you haven't set a Panda3D path, go to the Options tab, and browse for one. You must have a semi recent version of the Panda3D SDK, but the specific version doesn't matter.
     ![step13b](https://raw.githubusercontent.com/OpenToontownTools/web/master/assets/rpehowto/rpe_howto_step13b.png)
-14. Enter a pack file name. This should only include letters, numbers, spaces, dashes, or underscores.
+14. Enter a pack file name. This should only include letters, numbers, spaces, dashes, or underscores. 
 15. Press OK, the pack will compile.
 16. Press OPEN to browse to the outputted file.
 
