@@ -3,7 +3,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-import ast, builtins, glob, json, os, pathlib, requests, subprocess, sys
+import ast, builtins, glob, json, os, pathlib, requests, subprocess, sys, traceback
 from ui_window import Ui_MainWindow
 from ui_override import Ui_OverrideUI
 from ui_compiledial import Ui_CompilingDialog
@@ -204,18 +204,29 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         self.rootDisplay.setText(path)
         
         # Detect existing music.json file
-        if os.path.exists(f'{self.root}/audio/music.json'):
-            # If it exists, open and do everything
-            with open(f'{self.root}/audio/music.json') as jsonfile:
-                data = json.load(jsonfile)
-                if 'default' in data:
-                    for identifier in data['default']:
-                        self.updateLabel('default', identifier, data['default'][identifier])
-                for holiday in ['halloween', 'christmas', 'april-fools']:
-                    if holiday in data:
-                        for identifier in data[holiday]:
-                                self.addOverrideToTable(holiday, identifier, data[holiday][identifier])
-                
+        try:
+            if os.path.exists(f'{self.root}/audio/music.json'):
+                # If it exists, open and do everything
+                with open(f'{self.root}/audio/music.json') as jsonfile:
+                    data = json.load(jsonfile)
+                    if 'default' in data:
+                        for identifier in data['default']:
+                            self.updateLabel('default', identifier, data['default'][identifier])
+                    for holiday in ['halloween', 'christmas', 'april-fools']:
+                        if holiday in data:
+                            for identifier in data[holiday]:
+                                    self.addOverrideToTable(holiday, identifier, data[holiday][identifier])
+        except Exception as e:
+            # if theres an error loading, pop up an issue
+            # we can reuse compiledialog since its perfect for what we need
+            dial = CompileDialog()
+            tb = traceback.format_exc().replace("\n", "<br>").replace("  ", "&nbsp;")
+            dial.output.setText(f'<h1>Error loading music.json</h1><br><h3>{e}</h3><br><br><h3>Traceback:</h3>{tb}')
+            dial.buttonBox.setEnabled(True)
+            dial.buttonBox.accepted.connect(lambda: subprocess.run(['explorer.exe', '/select,', os.path.normpath(self.root)+f'\\audio\\music.json']))
+
+            dial.exec_()
+            sys.exit()
                 
                 
     def updateLabel(self, holiday, identifier, text):
