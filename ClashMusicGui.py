@@ -4,14 +4,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import ast, builtins, glob, json, os, pathlib, requests, subprocess, sys, traceback
-from ui_window import Ui_MainWindow
-from ui_override import Ui_OverrideUI
-from ui_compiledial import Ui_CompilingDialog
+from windows.UIMainWindow import Ui_MainWindow
+from windows.UIOverridePicker import Ui_OverrideUI
+from windows.UICompileDialog import Ui_CompilingDialog
+from windows.UIFilePicker import Ui_FileSelectDial
 from Settings import Settings
 
 class ClashMusicGui(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(ClashMusicGui, self).__init__(*args, **kwargs)
+        builtins.base = self
 
         # Get the path to the Documents library
         from sys import platform
@@ -62,7 +64,7 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
             browseBtn.setText("Browse")
             browseBtn.setMaximumSize(QSize(60, 34))
             # Bind it to a lambda event to pop up a file browser
-            browseBtn.pressed.connect(lambda i=music: self.browseForMusic(i))
+            browseBtn.pressed.connect(lambda i=music: self.selectMusicFile(i))
             
             # Create the label
             lbl = QLabel();
@@ -166,7 +168,7 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         browseBtn.setText('Browse')
         browseBtn.setMaximumSize(QSize(60, 34))
         # Bind it to a lambda event to pop up a file browser
-        browseBtn.pressed.connect(lambda i=identifier: self.browseForMusic(i, holiday))
+        browseBtn.pressed.connect(lambda i=identifier: self.selectMusicFile(i, holiday))
 
         
         # Create the label
@@ -333,52 +335,20 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         dial.buttonBox.accepted.connect(lambda: subprocess.run(['explorer.exe', '/select,', os.path.normpath(self.root)+f'\\{packname}.mf']))
 
         dial.exec_()
-
-    def browseForMusic(self, identifier, holiday:str = 'default'):
+        
+    def selectMusicFile(self, identifier:str, holiday:str = 'default'):        
         # If the user hasn't selected a root, we tell them they need to
         if not self.root:
             QMessageBox.warning(self, "ClashMusicGui", "You need to specify a pack root!\nClick the '...' button in the bottom left")
             return
-            
-        # to allow the user to select multiple files, we use getopenfilenames
-        path, _ = QFileDialog.getOpenFileNames(self, "Browse for OGG file(s)", self.root, "OGG Audio Files (*.ogg)")
+        dial = FileSelector(identifier = identifier, holiday = holiday)
         
-        # The user has selected more than one file
-        if len(path) > 1:
-            newpath = []
-            for p in path:
-                # Make sure the song is INSIDE of the content pack
-                if not p.startswith(self.root):
-                    dial = QMessageBox(self)
-                    dial.setWindowTitle("ClashMusicGui")
-                    dial.setText("You need to select a file inside the content pack!")
-                    dial.exec_()
-                    return
-                newpath.append(p.replace(self.root+'/', ''))
+        # exec_ returns 0 if the user his cancel, we want to know that
+        res = dial.exec_()
+        if dial.getSelectedMusic() and res:
+            self.updateLabel(holiday, identifier, dial.getSelectedMusic())
 
-            path = newpath
-            
-        # The user has selected one file
-        if len(path) == 1:
-            path = path[0]
-            
-            if not path.startswith(self.root):
-                dial = QMessageBox(self)
-                dial.setWindowTitle("ClashMusicGui")
-                dial.setText("You need to select a file inside the content pack!")
-                dial.exec_()
-                return
-            
-            path = path.replace(self.root+'/', '')
-            
-        # The user selected nothing, so we use 'None' which clash will read to not play any audio
-        if len(path) == 0:
-            path = "None"
 
-        # Set the text of the label
-        #self.lbls[index].setText(str(path))
-        self.updateLabel(holiday, identifier, str(path))
-        
     def browseForPanda(self):
         settings['panda-path'] = QFileDialog.getExistingDirectory(self, "Browse for Panda3D Root Directory", "C:/")
         self.label_3.setText(settings['panda-path'])
@@ -388,7 +358,6 @@ class OverridePopup(QDialog, Ui_OverrideUI):
         super(OverridePopup, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.show()
-        
 
 class CompileDialog(QDialog, Ui_CompilingDialog):
     def __init__(self, *args, **kwargs):
@@ -396,7 +365,80 @@ class CompileDialog(QDialog, Ui_CompilingDialog):
         self.setupUi(self)
         self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint)
         self.show()
-    
+
+class FileSelector(QDialog, Ui_FileSelectDial):
+    def __init__(self, identifier, holiday, *args, **kwargs):
+        super(FileSelector, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint)
+        self.identifier = identifier
+        self.holiday = holiday
+        self.selectedMusic = None
+        
+        self.pushButton.pressed.connect(self.manualInput)
+        
+        # Browse Button
+        self.pushButton_2.pressed.connect(self.browseForFile)
+        
+        # Set as none
+        self.pushButton_4.pressed.connect(self.disableTrack)        
+        self.show()
+        
+    def disableTrack(self):
+        ''' Sets the selected music as the NONE string, which clash can read '''
+        self.selectedMusic = 'None'
+        self.selectedLabel.setText('DISABLED')
+        
+    def setSelectedMusic(self, music:str):
+        self.selectedMusic = music
+        self.selectedLabel.setText(self.selectedMusic)
+        
+    def getSelectedMusic(self):
+        return self.selectedMusic
+        
+    def manualInput(self):
+        path, _ = QInputDialog.getText(self, "Manual Input", "Enter music location(s)")
+        if path:
+            self.setSelectedMusic(path)
+        
+    def browseForFile(self):
+        # to allow the user to select multiple files, we use getopenfilenames
+        path, _ = QFileDialog.getOpenFileNames(self, "Browse for OGG file(s)", base.root, "OGG Audio Files (*.ogg)")
+
+        # The user has selected more than one file
+        if len(path) > 1:
+            newpath = []
+            for p in path:
+                # Make sure the song is INSIDE of the content pack
+                if not p.startswith(base.root):
+                    dial = QMessageBox(self)
+                    dial.setWindowTitle("ClashMusicGui")
+                    dial.setText("You need to select a file inside the content pack!")
+                    dial.exec_()
+                    return
+                newpath.append(p.replace(base.root+'/', ''))
+
+            path = newpath
+            
+        # The user has selected one file
+        if len(path) == 1:
+            path = path[0]
+            
+            if not path.startswith(base.root):
+                dial = QMessageBox(self)
+                dial.setWindowTitle("ClashMusicGui")
+                dial.setText("You need to select a file inside the content pack!")
+                dial.exec_()
+                return
+            
+            path = path.replace(base.root+'/', '')
+            
+        # The user selected nothing, so we cancel
+        if len(path) == 0:
+            return
+            
+        self.setSelectedMusic(path)
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = ClashMusicGui()
