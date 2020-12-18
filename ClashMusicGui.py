@@ -10,6 +10,7 @@ from windows.UICompileDialog import Ui_CompilingDialog
 from windows.UIFilePicker import Ui_FileSelectDial
 from Settings import Settings
 
+
 class ClashMusicGui(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(ClashMusicGui, self).__init__(*args, **kwargs)
@@ -21,30 +22,30 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
         ctypes.windll.shell32.SHGetFolderPathW(None, 5, None, 0, buf)
         print(f"Found windows documents library at {buf.value}")
-        
+
         builtins.userfiles = os.path.join(buf.value, 'OpenToontownTools', 'ClashResourcePackEditor')
-        
+
         if not os.path.exists(userfiles):
             pathlib.Path(userfiles).mkdir(parents = True, exist_ok = True)
-            
+
         self.setupSettings()
-        
+
         self.setupUi(self)
         self.root = None
-        
+
         self.identifierToLabel = {
-            'default': {},
-            'halloween': {},
-            'christmas': {},
+            'default':     {},
+            'halloween':   {},
+            'christmas':   {},
             'april-fools': {}
-        }
-        
+            }
+
         self.overrides = {
-            'halloween': {},
-            'christmas': {},
+            'halloween':   {},
+            'christmas':   {},
             'april-fools': {}
-        }
-        
+            }
+
         # load the music.json
         self.defaultJson = self.getDefaultJson()
         i = 0
@@ -54,7 +55,7 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
             self.tableWidget.insertRow(rowPos)
             # Set the first column as the music name
             self.tableWidget.setItem(rowPos, 0, QTableWidgetItem(music))
-            
+
             # Create the second column widget
             # This widget includes a horizontal layout with 2 items
             # a browse button, and the label
@@ -64,16 +65,16 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
             browseBtn.setText("Browse")
             browseBtn.setMaximumSize(QSize(60, 34))
             # Bind it to a lambda event to pop up a file browser
-            browseBtn.pressed.connect(lambda i=music: self.selectMusicFile(i))
-            
+            browseBtn.pressed.connect(lambda i = music: self.selectMusicFile(i))
+
             # Create the label
             lbl = QLabel();
             # By default, we show the default song
             lbl.setText(str(self.defaultJson['default'][music]))
-            
+
             # Add the label to a list of labels for later editing
             self.identifierToLabel['default'][music] = lbl
-            
+
             # Make a horizontal layout to put them together
             horLay = QHBoxLayout(widget)
             horLay.addWidget(browseBtn)
@@ -83,30 +84,29 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
 
             # Set the widget as the contents of the second column
             self.tableWidget.setCellWidget(i, 1, widget)
-            i+=1
-        
+            i += 1
+
         # bind the save button to write music.json
         self.saveButton.pressed.connect(self.saveFile)
-        
+
         # bind the compile button to build the .mf
         self.compileButton.pressed.connect(self.compileMultifile)
-        
+
         self.addOverrideButton_HA.pressed.connect(lambda: self.selectOverride('halloween'))
         self.addOverrideButton_WI.pressed.connect(lambda: self.selectOverride('christmas'))
         self.addOverrideButton_AF.pressed.connect(lambda: self.selectOverride('april-fools'))
-        
+
         self.optionsBrowsePandaPath.pressed.connect(self.browseForPanda)
         self.label_3.setText(settings['panda-path'])
-        
-       
+
         self.browseForRoot()
         if not self.root:
             sys.exit()
-        
+
         # We are done setting up the window
         # Now show it
         self.show()
-        
+
     def getDefaultJson(self):
         print("Downloading latest music.json file")
         try:
@@ -116,44 +116,44 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
                 cache.writelines(req.text)
             return req.json()
         except:
-            QMessageBox.warning(self, "Clash Resource Pack Editor", "Unable to download latest default music.json file\nCheck your internet connection.\nUsing latest cached download.")
+            QMessageBox.warning(self, "Clash Resource Pack Editor",
+                                "Unable to download latest default music.json file\nCheck your internet connection.\nUsing latest cached download.")
             print("using cached version")
             return json.load(open('default.json'))
-        
+
     def setupSettings(self):
         builtins.settings = Settings(f'{userfiles}/config.ott')
         if 'panda-path' not in settings:
             settings['panda-path'] = 'None'
-        
-    def selectOverride(self, holiday:str):
+
+    def selectOverride(self, holiday: str):
         self.dial = OverridePopup()
         self.dial.buttonBox.accepted.connect(lambda: self.addOverride(holiday, self.dial.listWidget.selectedItems()))
-        
+
         for music in self.defaultJson['default']:
             if not music in self.identifierToLabel[holiday]:
                 self.dial.listWidget.addItem(QListWidgetItem(music))
-        
+
         self.dial.exec_()
-        
-    def addOverride(self, holiday:str, musics):        
+
+    def addOverride(self, holiday: str, musics):
         for music in musics:
             identifier = music.text()
             self.addOverrideToTable(holiday, identifier, 'None')
-        
-        
+
         self.dial.close()
-        
-    def addOverrideToTable(self, holiday, identifier:str, file:str):
+
+    def addOverrideToTable(self, holiday, identifier: str, file: str):
         # todo:put the defualt stuff here too
-        
+
         tables = {
-            'halloween' : self.overrideTable_HA,
-            'christmas' : self.overrideTable_WI,
+            'halloween':   self.overrideTable_HA,
+            'christmas':   self.overrideTable_WI,
             'april-fools': self.overrideTable_AF
-        }
-        
+            }
+
         table = tables[holiday]
-    
+
         rowPos = table.rowCount()
         table.insertRow(rowPos)
         # Set the first column as the music name
@@ -168,35 +168,34 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         browseBtn.setText('Browse')
         browseBtn.setMaximumSize(QSize(60, 34))
         # Bind it to a lambda event to pop up a file browser
-        browseBtn.pressed.connect(lambda i=identifier: self.selectMusicFile(i, holiday))
+        browseBtn.pressed.connect(lambda i = identifier: self.selectMusicFile(i, holiday))
 
-        
         # Create the label
         lbl = QLabel();
         # Set the text as the file(s)
         lbl.setText(str(file))
-        
+
         # Add the label to a list of labels for later editing
 
         self.identifierToLabel[holiday][identifier] = lbl
-        
+
         # Make a horizontal layout to put them together
         horLay = QHBoxLayout(widget)
         horLay.addWidget(browseBtn)
         horLay.addWidget(lbl)
-        
+
         if holiday != 'default':
             removeBtn = QPushButton()
             removeBtn.setText('Remove')
             removeBtn.setMaximumSize(QSize(60, 34))
-            removeBtn.pressed.connect(lambda i=identifier: self.removeOverride(i, holiday))
+            removeBtn.pressed.connect(lambda i = identifier: self.removeOverride(i, holiday))
             horLay.addWidget(removeBtn)
         horLay.setContentsMargins(0, 0, 0, 0);
         widget.setLayout(horLay)
 
         # Set the widget as the contents of the second column
         table.setCellWidget(rowPos, 1, widget)
-        
+
     def browseForRoot(self):
         lastpath = settings['last-path'] if 'last-path' in settings else ""
         path = QFileDialog.getExistingDirectory(self, "Browse for Root Directory", lastpath)
@@ -204,7 +203,7 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         if not self.root: return
         settings['last-path'] = path
         self.rootDisplay.setText(path)
-        
+
         # Detect existing music.json file
         try:
             if os.path.exists(f'{self.root}/audio/music.json'):
@@ -217,7 +216,7 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
                     for holiday in ['halloween', 'christmas', 'april-fools']:
                         if holiday in data:
                             for identifier in data[holiday]:
-                                    self.addOverrideToTable(holiday, identifier, data[holiday][identifier])
+                                self.addOverrideToTable(holiday, identifier, data[holiday][identifier])
         except Exception as e:
             # if theres an error loading, pop up an issue
             # we can reuse compiledialog since its perfect for what we need
@@ -225,14 +224,14 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
             tb = traceback.format_exc().replace("\n", "<br>").replace("  ", "&nbsp;")
             dial.output.setText(f'<h1>Error loading music.json</h1><br><h3>{e}</h3><br><br><h3>Traceback:</h3>{tb}')
             dial.buttonBox.setEnabled(True)
-            dial.buttonBox.accepted.connect(lambda: subprocess.run(['explorer.exe', '/select,', os.path.normpath(self.root)+f'\\audio\\music.json']))
+            dial.buttonBox.accepted.connect(lambda: subprocess.run(
+                    ['explorer.exe', '/select,', os.path.normpath(self.root) + f'\\audio\\music.json']))
 
             dial.exec_()
             sys.exit()
-                
-                
+
     def updateLabel(self, holiday, identifier, text):
-        #self.identifierToLabel[holiday][identifier].setText(text)
+        # self.identifierToLabel[holiday][identifier].setText(text)
         if holiday == 'default':
             if text == self.defaultJson[holiday][identifier]:
                 self.identifierToLabel[holiday][identifier].setText(text)
@@ -240,118 +239,122 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
                 self.identifierToLabel[holiday][identifier].setText(f"<i>{text}</i>")
         else:
             self.identifierToLabel[holiday][identifier].setText(text)
-                
-    def removeOverride(self, identifier, holiday):   
+
+    def removeOverride(self, identifier, holiday):
         self.updateLabel(holiday, identifier, 'None')
         tables = {
-            'halloween' : self.overrideTable_HA,
-            'christmas' : self.overrideTable_WI,
+            'halloween':   self.overrideTable_HA,
+            'christmas':   self.overrideTable_WI,
             'april-fools': self.overrideTable_AF
-        }
-        
+            }
+
         table = tables[holiday]
-        
+
         rowNum = -1
-        
+
         for row in range(table.rowCount()):
             idCol = table.item(row, 0)
             if idCol.text() == identifier:
                 print(f'found identifier on row {row}')
                 rowNum = row
                 break
-        
+
         table.removeRow(rowNum)
         del self.identifierToLabel[holiday][identifier]
 
     def saveFile(self):
         # If the user hasn't selected a root, we tell them they need to
         if not self.root:
-            QMessageBox.warning(self, "ClashMusicGui", "You need to specify a pack root!\nClick the '...' button in the bottom left")
+            QMessageBox.warning(self, "ClashMusicGui",
+                                "You need to specify a pack root!\nClick the '...' button in the bottom left")
             return
-            
+
         with open(f'{self.root}/audio/music.json', 'w') as output:
-        
+
             data = {
                 # This doesn't work right now, it prevents the file from loading in clash for some reason
-                #'_OpenToontownTools': "This file was generated using the Clash Music GUI. https://github.com/OpenToontownTools/ClashMusicGUI",
-                'default': {},
-                'halloween': {},
-                'christmas': {},
+                # '_OpenToontownTools': "This file was generated using the Clash Music GUI. https://github.com/OpenToontownTools/ClashMusicGUI",
+                'default':     {},
+                'halloween':   {},
+                'christmas':   {},
                 'april-fools': {}
-            }
-            
+                }
+
             tables = {
-                'default': self.tableWidget,
-                'halloween' : self.overrideTable_HA,
-                'christmas' : self.overrideTable_WI,
+                'default':     self.tableWidget,
+                'halloween':   self.overrideTable_HA,
+                'christmas':   self.overrideTable_WI,
                 'april-fools': self.overrideTable_AF
-            }
-            
+                }
+
             for holiday in tables:
                 for row in range(tables[holiday].rowCount()):
                     identifier = tables[holiday].item(row, 0).text()
                     file = self.identifierToLabel[holiday][identifier].text().replace('<i>', '').replace('</i>', '')
-                    
+
                     if '[' in file:
                         file = ast.literal_eval(file)
-                    
+
                     if file != self.defaultJson['default'][identifier] or holiday != 'default':
                         data[holiday][identifier] = file
 
             for type in ['default', 'halloween', 'christmas', 'april-fools']:
                 if len(data[type]) == 0:
                     del data[type]
-                        
+
             output.writelines(json.dumps(data, indent = 4, sort_keys = True))
             QMessageBox.information(self, "Corporate Clash music.json Editor", "Saved!")
-        
 
     def compileMultifile(self):
         if not os.path.exists(settings['panda-path']):
             QMessageBox.warning(self, "ClashMusicGui", "You need to select your Panda3D directory in the OPTIONS tab!")
             return
         self.saveFile()
-        packname, _ = QInputDialog.getText(self, "Pack File Name", "Enter a pack filename", text = os.path.basename(self.root))
-        
+        packname, _ = QInputDialog.getText(self, "Pack File Name", "Enter a pack filename",
+                                           text = os.path.basename(self.root))
+
         args = [
             f"{settings['panda-path']}/bin/multify.exe",
             '-c', f'-f{packname}.mf']
-            
+
         # Include all folders / files inside the root
         for path in glob.glob(f'{self.root}/*'):
             # except for .mf files - its likely a previous compiled verison
             if os.path.splitext(path)[1] == '.mf':
                 continue
             args.append(os.path.basename(path))
-        
-        process = subprocess.run(args, shell = True, cwd = self.root, stderr = subprocess.PIPE, universal_newlines=True)
 
+        process = subprocess.run(args, shell = True, cwd = self.root, stderr = subprocess.PIPE,
+                                 universal_newlines = True)
 
         dial = CompileDialog()
         print(process.stderr)
         out = process.stderr.replace('\n', '<br>')
-        dial.output.setText(f'<h2>Command Args</h2>{process.args}<br><h2>Output</h2>{out}<br><h2>Compiling Finished!</h2>')
+        dial.output.setText(
+                f'<h2>Command Args</h2>{process.args}<br><h2>Output</h2>{out}<br><h2>Compiling Finished!</h2>')
         dial.buttonBox.setEnabled(True)
-        dial.buttonBox.accepted.connect(lambda: subprocess.run(['explorer.exe', '/select,', os.path.normpath(self.root)+f'\\{packname}.mf']))
+        dial.buttonBox.accepted.connect(
+                lambda: subprocess.run(['explorer.exe', '/select,', os.path.normpath(self.root) + f'\\{packname}.mf']))
 
         dial.exec_()
-        
-    def selectMusicFile(self, identifier:str, holiday:str = 'default'):        
+
+    def selectMusicFile(self, identifier: str, holiday: str = 'default'):
         # If the user hasn't selected a root, we tell them they need to
         if not self.root:
-            QMessageBox.warning(self, "ClashMusicGui", "You need to specify a pack root!\nClick the '...' button in the bottom left")
+            QMessageBox.warning(self, "ClashMusicGui",
+                                "You need to specify a pack root!\nClick the '...' button in the bottom left")
             return
         dial = FileSelector(identifier = identifier, holiday = holiday)
-        
+
         # exec_ returns 0 if the user his cancel, we want to know that
         res = dial.exec_()
         if dial.getSelectedMusic() and res:
             self.updateLabel(holiday, identifier, dial.getSelectedMusic())
 
-
     def browseForPanda(self):
         settings['panda-path'] = QFileDialog.getExistingDirectory(self, "Browse for Panda3D Root Directory", "C:/")
         self.label_3.setText(settings['panda-path'])
+
 
 class OverridePopup(QDialog, Ui_OverrideUI):
     def __init__(self, *args, **kwargs):
@@ -359,12 +362,14 @@ class OverridePopup(QDialog, Ui_OverrideUI):
         self.setupUi(self)
         self.show()
 
+
 class CompileDialog(QDialog, Ui_CompilingDialog):
     def __init__(self, *args, **kwargs):
         super(CompileDialog, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint)
         self.show()
+
 
 class FileSelector(QDialog, Ui_FileSelectDial):
     def __init__(self, identifier, holiday, *args, **kwargs):
@@ -374,33 +379,33 @@ class FileSelector(QDialog, Ui_FileSelectDial):
         self.identifier = identifier
         self.holiday = holiday
         self.selectedMusic = None
-        
+
         self.pushButton.pressed.connect(self.manualInput)
-        
+
         # Browse Button
         self.pushButton_2.pressed.connect(self.browseForFile)
-        
+
         # Set as none
-        self.pushButton_4.pressed.connect(self.disableTrack)        
+        self.pushButton_4.pressed.connect(self.disableTrack)
         self.show()
-        
+
     def disableTrack(self):
         ''' Sets the selected music as the NONE string, which clash can read '''
         self.selectedMusic = 'None'
         self.selectedLabel.setText('DISABLED')
-        
-    def setSelectedMusic(self, music:str):
+
+    def setSelectedMusic(self, music: str):
         self.selectedMusic = music
         self.selectedLabel.setText(self.selectedMusic)
-        
+
     def getSelectedMusic(self):
         return self.selectedMusic
-        
+
     def manualInput(self):
         path, _ = QInputDialog.getText(self, "Manual Input", "Enter music location(s)")
         if path:
             self.setSelectedMusic(path)
-        
+
     def browseForFile(self):
         # to allow the user to select multiple files, we use getopenfilenames
         path, _ = QFileDialog.getOpenFileNames(self, "Browse for OGG file(s)", base.root, "OGG Audio Files (*.ogg)")
@@ -416,28 +421,29 @@ class FileSelector(QDialog, Ui_FileSelectDial):
                     dial.setText("You need to select a file inside the content pack!")
                     dial.exec_()
                     return
-                newpath.append(p.replace(base.root+'/', ''))
+                newpath.append(p.replace(base.root + '/', ''))
 
             path = newpath
-            
+
         # The user has selected one file
         if len(path) == 1:
             path = path[0]
-            
+
             if not path.startswith(base.root):
                 dial = QMessageBox(self)
                 dial.setWindowTitle("ClashMusicGui")
                 dial.setText("You need to select a file inside the content pack!")
                 dial.exec_()
                 return
-            
-            path = path.replace(base.root+'/', '')
-            
+
+            path = path.replace(base.root + '/', '')
+
         # The user selected nothing, so we cancel
         if len(path) == 0:
             return
-            
+
         self.setSelectedMusic(path)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

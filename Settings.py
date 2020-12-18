@@ -5,6 +5,7 @@ Slight override of a typical dict to make the file auto save when a change is ma
 
 import collections, json, os
 
+
 class Settings(collections.MutableMapping):
 
     def __init__(self, filename):
@@ -29,8 +30,7 @@ class Settings(collections.MutableMapping):
         with open(self.filename, 'w') as jsonFile:
             json.dump(self.data, jsonFile, indent = 4)
             print('Saved settings')
-            
-    
+
     ''' Overrides '''
 
     def __getitem__(self, key):
