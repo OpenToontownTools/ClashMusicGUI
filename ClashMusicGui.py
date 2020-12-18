@@ -102,7 +102,10 @@ class ClashMusicGui(QMainWindow, Ui_MainWindow):
         self.browseForRoot()
         if not self.root:
             sys.exit()
-
+        
+        # Clash doesn't have any pack info yet, so we disable this tab for now
+        self.tabWidget.setTabEnabled(4, False)
+        
         # We are done setting up the window
         # Now show it
         self.show()

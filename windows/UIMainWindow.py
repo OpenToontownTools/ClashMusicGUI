@@ -221,7 +221,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_7.addItem(self.horizontalSpacer_3, 1, 4, 1, 1)
 
-        #self.tabWidget.addTab(self.tab_5, "")
+        self.tabWidget.addTab(self.tab_5, "")
         self.tab_6 = QWidget()
         self.tab_6.setObjectName(u"tab_6")
         self.gridLayout_2 = QGridLayout(self.tab_6)
@@ -304,7 +304,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(5)
+        self.tabWidget.setCurrentIndex(0)
         self.pushButton.setDefault(False)
 
 
