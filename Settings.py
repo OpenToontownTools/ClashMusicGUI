@@ -1,7 +1,7 @@
-''' 
-OpenTTTools Settings 
+"""
+OpenTTTools Settings
 Slight override of a typical dict to make the file auto save when a change is made
-'''
+"""
 
 import collections, json, os
 
@@ -26,7 +26,7 @@ class Settings(collections.MutableMapping):
             self.save()
 
     def save(self):
-        ''' Write settings changes to the json file '''
+        """ Write settings changes to the json file """
         with open(self.filename, 'w') as jsonFile:
             json.dump(self.data, jsonFile, indent = 4)
             print('Saved settings')
@@ -34,25 +34,25 @@ class Settings(collections.MutableMapping):
     ''' Overrides '''
 
     def __getitem__(self, key):
-        ''' x = settings['setting'] override '''
+        """ x = settings['setting'] override """
         return self.data[key]
 
     def __setitem__(self, key, value):
-        ''' settings['setting'] = 'value' override '''
+        """ settings['setting'] = 'value' override """
         self.data[key] = value
         # Save the file
         self.save()
 
     def __delitem__(self, key):
-        ''' del settings['setting'] override '''
+        """ del settings['setting'] override """
         del self.data[key]
         # Save the file
         self.save()
 
     def __iter__(self):
-        ''' iteration override (e.g. for x in settings) '''
+        """ iteration override (e.g. for x in settings) """
         return iter(self.data)
 
     def __len__(self):
-        ''' len(settings) Override '''
+        """ len(settings) Override """
         return len(self.data)

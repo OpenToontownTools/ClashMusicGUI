@@ -1,4 +1,4 @@
-''' Corporate Clash Music.JSON editor GUI '''
+""" Corporate Clash Music.JSON editor GUI """
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -390,7 +390,7 @@ class FileSelector(QDialog, Ui_FileSelectDial):
         self.show()
 
     def disableTrack(self):
-        ''' Sets the selected music as the NONE string, which clash can read '''
+        """ Sets the selected music as the NONE string, which clash can read """
         self.selectedMusic = 'None'
         self.selectedLabel.setText('DISABLED')
 
