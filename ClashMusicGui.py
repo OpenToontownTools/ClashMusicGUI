@@ -412,7 +412,7 @@ class FileSelector(QDialog, Ui_FileSelectDial):
     def browseForFile(self):
         # to allow the user to select multiple files, we use getopenfilenames
         path, _ = QFileDialog.getOpenFileNames(self, "Browse for OGG file(s)", base.root, "OGG Audio Files (*.ogg)")
-        print(len(path))
+
         # The user has selected more than one file
         if len(path) > 1:
             newpath = []
