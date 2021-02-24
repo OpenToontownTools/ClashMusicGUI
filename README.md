@@ -2,7 +2,7 @@
 Tool to assist resource pack creators with Music.json
 
 The source code is publicly available for contributions, but if you do not intend on contributing, I recommend you download the pre-built [installers](https://github.com/OpenToontownTools/ClashMusicGUI/releases)
-(The installer will eventually be replaced with an Open Toontown Tools launcher which includes auto updating and will be a hub for all Open Toontown Tools applications)
+(The installer will maybe eventually be replaced with an Open Toontown Tools launcher which includes auto updating and will be a hub for all Open Toontown Tools applications)
 
 ## Notices
 * Currently there is no way to select vanilla base game files using this tool, it is currently required that all music files you want to use are located inside of your pack root directory. This will likely change in the future
